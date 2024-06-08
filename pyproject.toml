@@ -1,0 +1,22 @@
+[project]
+name = "clic_campus"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Jonas Bouaziz", email = "jonas.bouaziz@epita.fr"},
+]
+
+requires-python = ">3.11"
+readme = "README.md"
+license = {text = "MIT"}
+dependencies = [
+    "httpx>=0.27.0",
+    "spacy>=3.7.5",
+    "fr-core-news-lg @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_lg-3.7.0/fr_core_news_lg-3.7.0-py3-none-any.whl",
+    "streamlit>=1.35.0",
+    "pymongo>=4.7.3",
+]
+
+
+[tool.pdm]
+distribution = false
