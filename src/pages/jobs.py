@@ -9,14 +9,14 @@ st.header("Create job collection")
 
 
 @st.cache_data
-def departement():
-    return scrapper.query(endpoint="/referentiel/departements").json()
+def departement(sc):
+    return sc.query(endpoint="/referentiel/departements").json()
 
 
 with st.sidebar:
     with st.form("run", border=False):
         scrapper = Scrapper()
-        deps = departement()
+        deps = departement(scrapper)
         departement = st.selectbox("Département", [d["code"] for d in deps],
                                    format_func=lambda x: [d["libelle"] for d in deps if d["code"] == x][0])
         limit = st.slider("Limit", 1, 10000, 10)
