@@ -1,13 +1,10 @@
-from collections import Counter
-
 import streamlit as st
 
-from pages.utils import Scrapper, Db
+from pages.utils import Db
 
 st.header("Create vocabulary collection")
 
 
-# col1, col2 = st.columns(2)
 
 def set_data():
     st.session_state["vocab_data"] = Db.get_ids("vocab", [st.session_state["vocab_collection"]])
