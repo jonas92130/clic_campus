@@ -68,5 +68,22 @@ class Scrapper:
                     document["counters"][w.pos_][w.lemma_] += weight
         return document
 
+    @staticmethod
+    def score_matching(doc1, doc2, vocab):
+        doc1_counter_all = Counter()
+        doc2_counter_all = Counter()
+        for pos, counter in doc1.get("counters", {}).items():
+            doc1_counter_all.update(counter)
+        for pos, counter in doc2.get("counters", {}).items():
+            doc2_counter_all.update(counter)
+        intersection = doc1_counter_all & doc2_counter_all
+        addition = doc1_counter_all + doc2_counter_all
+        for word in intersection:
+            if word not in vocab:
+                intersection.pop(word)
+            else:
+                intersection[word] = addition[word]
+        return sum(intersection.values())
+
     def run(self, parameters, limit):
         self.db.insert(self.iterate(parameters, limit), get_id=lambda x: x["id"])

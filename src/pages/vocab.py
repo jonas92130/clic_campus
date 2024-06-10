@@ -26,23 +26,23 @@ with st.sidebar:
 
 col1, col2 = st.columns(2, gap="large")
 with col1:
-    if collection := st.session_state["vocab_collection"]:
+    if st.session_state.get("vocab_data"):
+        collection = st.session_state["vocab_collection"]
         st.subheader(f"Vocabulary {collection}")
-        if st.session_state.get("vocab_data"):
-            select_all = st.checkbox("Select All", value=True)
-            with st.form('vocab_form'):
-                checkboxes = []
-                with st.container(height=500, border=False):
-                    for word in st.session_state["vocab_data"]:
-                        checkboxes.append((st.checkbox(f"{word}", value=select_all), word))
-                if st.form_submit_button("Save", type="primary"):
-                    db = Db.get_db("vocab", collection)
-                    db.remove_ids([word for checked, word in checkboxes if not checked])
-                    set_data()
+        select_all = st.checkbox("Select All", value=True)
+        with st.form('vocab_form'):
+            checkboxes = []
+            with st.container(height=500, border=False):
+                for word in st.session_state["vocab_data"]:
+                    checkboxes.append((st.checkbox(f"{word}", value=select_all), word))
+            if st.form_submit_button("Save", type="primary"):
+                db = Db.get_db("vocab", collection)
+                db.remove_ids([word for checked, word in checkboxes if not checked])
+                set_data()
         # st.write(data)
 with col2:
-    st.subheader("Jobs keywords")
     if st.session_state.get("counters"):
+        st.subheader("Jobs keywords")
         counters = st.session_state["counters"]
         nb_values = st.slider("Top", 1, 1000, 100)
         option = st.selectbox('POS', ["ALL"] + [c for c in counters if c != "ALL"])

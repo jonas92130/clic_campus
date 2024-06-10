@@ -56,3 +56,12 @@ class Db:
 
     def remove_ids(self, ids):
         mongo[self.collection].delete_many({"_id": {"$in": ids}})
+
+    @classmethod
+    def get_documents(cls, namespace, collections):
+        ids = set()
+        for collection in collections:
+            for doc in mongo[f"{namespace}_{collection}"].find():
+                if doc["_id"] not in ids:
+                    ids.add(doc["_id"])
+                    yield doc
