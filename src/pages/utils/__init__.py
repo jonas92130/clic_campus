@@ -5,7 +5,7 @@ try:
     with open("/home/jonas/Copeelote/clic_campus/src/.env") as f:
         for line in f:
             key, value = line.strip().split('="')
-            environ[key] = value
+            environ[key] = value[:-1]
 except FileNotFoundError:
     print("No .env file found")
 
