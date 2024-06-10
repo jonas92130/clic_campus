@@ -24,8 +24,8 @@ with st.sidebar:
         st.write("Or select an existing collection")
         selected_collection = st.selectbox("Collection", Db.get_collections("jobs"))
         job_collection = collection or selected_collection
-        st.session_state["job_collection"] = job_collection
         if st.form_submit_button("Run"):
+            st.session_state["job_collection"] = job_collection
             scrapper.db = Db.get_db("jobs", job_collection)
             scrapper.run(parameters={"departement": departement}, limit=limit)
 
