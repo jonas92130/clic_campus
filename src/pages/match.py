@@ -19,12 +19,12 @@ with st.sidebar:
                                                             st.session_state["vocab_collections"])
                 docs.append(document)
             st.session_state["documents"] = sorted(docs, key=lambda x: x["score"], reverse=True)
-            st.write(st.session_state["documents"])
-    limit = st.slider("Limit", 1, 100, 10)
-    if st.session_state.get("documents"):
-        st.subheader("Results")
-        for document in st.session_state["documents"][:limit]:
-            st.write(document)
+            st.write(st.session_state["experience_doc"])
+limit = st.slider("Limit", 1, 100, 10)
+if st.session_state.get("documents"):
+    st.subheader("Results")
+    for document in st.session_state["documents"][:limit]:
+        st.write(document)
 
 
 

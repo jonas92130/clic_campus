@@ -80,9 +80,10 @@ class Scrapper:
         addition = doc1_counter_all + doc2_counter_all
         for word in intersection:
             if word not in vocab:
-                intersection.pop(word)
+                intersection[word] = 0
             else:
                 intersection[word] = addition[word]
+        doc1["matched_keywords"] = intersection
         return sum(intersection.values())
 
     def run(self, parameters, limit):
