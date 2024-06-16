@@ -5,7 +5,7 @@
 groups = ["default"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:bbd719ab45d797ab180f5f57350f2456ffa2b8252b378c5e1518c95db213c345"
+content_hash = "sha256:0c16bf316e5fe8a5cb70df174832bbdf7145815142f93016a308c167ce0b85e6"
 
 [[package]]
 name = "altair"
@@ -263,6 +263,19 @@ dependencies = [
 ]
 files = [
     {file = "fr_core_news_lg-3.7.0-py3-none-any.whl", hash = "sha256:c2d98eb9073ff0f3d865179448e7f1868f27b2643c0e7215acc2438cd9eae554"},
+]
+
+[[package]]
+name = "fr-core-news-sm"
+version = "3.7.0"
+url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.7.0/fr_core_news_sm-3.7.0-py3-none-any.whl"
+summary = "French pipeline optimized for CPU. Components: tok2vec, morphologizer, parser, senter, ner, attribute_ruler, lemmatizer."
+groups = ["default"]
+dependencies = [
+    "spacy<3.8.0,>=3.7.0",
+]
+files = [
+    {file = "fr_core_news_sm-3.7.0-py3-none-any.whl", hash = "sha256:37e9f1f6a278a5138fabdabcc92cc559da917f9b24c76f0adf6758720d7eab10"},
 ]
 
 [[package]]
