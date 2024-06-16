@@ -5,7 +5,7 @@ import httpx
 import spacy
 import streamlit as st
 
-nlp = spacy.load("fr_core_news_lg", exclude=["ner"])
+nlp = spacy.load("fr_core_news_sm", exclude=["ner"])
 
 
 class Scrapper:
@@ -58,14 +58,14 @@ class Scrapper:
             start = int(parts[0].split("-")[-1])
 
     @staticmethod
-    def find_keywords(document):
+    def find_keywords(document, vocab=None):
         document["counters"] = defaultdict(Counter)
         for weight, text in [(1, document.get("description")), (3, document.get("intitule"))]:
             doc = nlp(text)
             for w in doc:
                 if not w.is_stop and w.is_alpha:
-                    # st.write(str((w.pos_, w.lemma_)))
-                    document["counters"][w.pos_][w.lemma_] += weight
+                    if vocab is not None and w.lemma_ in vocab:
+                        document["counters"][w.pos_][w.lemma_] += weight
         return document
 
     @staticmethod

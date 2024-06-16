@@ -15,18 +15,20 @@ def departement():
 
 
 @st.cache_data
-def secteur_activite():
-    return scrapper.query(endpoint="/referentiel/secteursActivites").json()
+def domaines():
+    return scrapper.query(endpoint="/referentiel/domaines").json()
 
 
 with st.sidebar:
     with st.form("run", border=False):
         deps = departement()
-        departement = st.selectbox("Département", [d["code"] for d in deps],
-                                   format_func=lambda x: [d["libelle"] for d in deps if d["code"] == x][0])
-        sects = secteur_activite()
-        secteur_activite = st.selectbox("Secteur d'activité", [d["code"] for d in sects],
-                                        format_func=lambda x: [d["libelle"] for d in sects if d["code"] == x][0])
+        departement = st.selectbox("Département", [None] + [d["code"] for d in deps],
+                                   format_func=lambda x: "Tous" if not x else
+                                   [d["libelle"] for d in deps if d["code"] == x][0])
+        doms = domaines()
+        domaine = st.selectbox("Domaine", [None] + [d["code"] for d in doms],
+                                        format_func=lambda x: "Tous" if not x else
+                                        [d["libelle"] for d in doms if d["code"] == x][0])
         limit = st.slider("Limit", 1, 10000, 10)
         collection = st.text_input("Collection")
         st.write("Or select an existing collection")
@@ -35,8 +37,10 @@ with st.sidebar:
         if st.form_submit_button("Run"):
             st.session_state["job_collection"] = job_collection
             scrapper.db = Db.get_db("jobs", job_collection)
-            scrapper.run(parameters={"departement": departement, "secteurActivite": secteur_activite}, limit=limit)
+            scrapper.run(parameters={"departement": departement, "domaine": domaine}, limit=limit)
 
 if job_collection := st.session_state.get("job_collection"):
-    for doc in Db.get_documents("jobs", [job_collection]):
+    for i, doc in enumerate(Db.get_documents("jobs", [job_collection])):
         st.write(doc)
+        if i > 10:
+            break
