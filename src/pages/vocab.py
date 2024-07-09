@@ -44,7 +44,7 @@ with col2:
     if st.session_state.get("counters"):
         st.subheader("Jobs keywords")
         counters = st.session_state["counters"]
-        nb_values = st.slider("Top", 1, 1000, 100)
+        nb_values = st.slider("Top", 1, 50000, 100)
         option = st.selectbox('POS', ["ALL"] + [c for c in counters if c != "ALL"])
         select_all = st.checkbox("Select All", value=True, key="words_select_all")
         with st.form('words_form'):
