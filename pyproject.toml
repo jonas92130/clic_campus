@@ -15,6 +15,7 @@ dependencies = [
     "streamlit>=1.35.0",
     "pymongo>=4.7.3",
     "fr-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.7.0/fr_core_news_sm-3.7.0-py3-none-any.whl",
+    "fr-core-news-lg @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_lg-3.7.0/fr_core_news_lg-3.7.0-py3-none-any.whl",
 ]
 
 

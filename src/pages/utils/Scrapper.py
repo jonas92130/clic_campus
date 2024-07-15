@@ -1,11 +1,11 @@
 from collections import Counter, defaultdict
-from functools import cached_property
+from functools import cached_property, cache
 
 import httpx
 import spacy
 import streamlit as st
 
-nlp = spacy.load("fr_core_news_sm", exclude=["ner"])
+nlp = spacy.load("fr_core_news_lg", exclude=["ner"])
 
 
 class Scrapper:
@@ -64,9 +64,22 @@ class Scrapper:
             doc = nlp(text)
             for w in doc:
                 if not w.is_stop and w.is_alpha:
-                    if vocab is not None and w.lemma_ in vocab:
+                    if vocab is not None and w.lemma_ not in vocab:
                         document["counters"][w.pos_][w.lemma_] += weight
         return document
+
+    @staticmethod
+    @cache
+    def most_similar(word, topn=15):
+        st.write(word)
+        word = nlp.vocab[str(word)]
+        queries = [
+            nlp.vocab[w] for w in nlp.vocab.vectors
+            if nlp.vocab[w].is_lower == word.is_lower
+        ]
+
+        by_similarity = sorted(queries, key=lambda w: word.similarity(w), reverse=True)
+        return [(str(w.lower_), float(w.similarity(word))) for w in by_similarity[:topn + 1] if w.lower_ != word.lower_]
 
     @staticmethod
     def score_matching(doc1, doc2, vocab):
@@ -76,10 +89,14 @@ class Scrapper:
             doc1_counter_all.update(counter)
         for pos, counter in doc2.get("counters", {}).items():
             doc2_counter_all.update(counter)
+            for elem in counter:
+                for word, similarity in Scrapper.most_similar(elem):
+                    if word not in doc2_counter_all:
+                        doc2_counter_all[word] = similarity
         intersection = doc1_counter_all & doc2_counter_all
         addition = doc1_counter_all + doc2_counter_all
         for word in intersection:
-            if word not in vocab:
+            if word in vocab:
                 intersection[word] = 0
             else:
                 intersection[word] = addition[word]
