@@ -4,6 +4,7 @@ from functools import cached_property, cache
 import httpx
 import spacy
 import streamlit as st
+from wordfreq import zipf_frequency
 
 nlp = spacy.load("fr_core_news_lg", exclude=["ner"])
 
@@ -71,7 +72,7 @@ class Scrapper:
     @staticmethod
     @cache
     def most_similar(word, topn=15):
-        st.write(word)
+        st.write(f"{word} ({zipf_frequency(word, 'fr')})")
         word = nlp.vocab[str(word)]
         queries = [
             nlp.vocab[w] for w in nlp.vocab.vectors
@@ -79,7 +80,9 @@ class Scrapper:
         ]
 
         by_similarity = sorted(queries, key=lambda w: word.similarity(w), reverse=True)
-        return [(str(w.lower_), float(w.similarity(word))) for w in by_similarity[:topn + 1] if w.lower_ != word.lower_]
+        res = [(str(w.lower_), float(w.similarity(word)), zipf_frequency(w.lower_, 'fr')) for w in by_similarity[:topn + 1] if w.lower_ != word.lower_]
+        st.write(res)
+        return res
 
     @staticmethod
     def score_matching(doc1, doc2, vocab):
@@ -90,9 +93,14 @@ class Scrapper:
         for pos, counter in doc2.get("counters", {}).items():
             doc2_counter_all.update(counter)
             for elem in counter:
-                for word, similarity in Scrapper.most_similar(elem):
+                freq = zipf_frequency(elem, "fr")
+                coef = (1 + 8 / freq if freq > 0 else 0) ** 3
+                doc2_counter_all[elem] = doc2_counter_all[elem] * coef
+                for word, similarity, freq in Scrapper.most_similar(elem):
                     if word not in doc2_counter_all:
-                        doc2_counter_all[word] = similarity
+                        freq = zipf_frequency(word, "fr")
+                        coef = (1 + 1 / freq if freq > 0 else 0) ** 3
+                        doc2_counter_all[word] = similarity * (coef ** 2)
         intersection = doc1_counter_all & doc2_counter_all
         addition = doc1_counter_all + doc2_counter_all
         for word in intersection:
@@ -101,6 +109,7 @@ class Scrapper:
             else:
                 intersection[word] = addition[word]
         doc1["matched_keywords"] = intersection
+        doc1["experience_keywords"] = doc2_counter_all
         return sum(intersection.values())
 
     def run(self, parameters, limit):
