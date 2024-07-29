@@ -59,20 +59,35 @@ class Scrapper:
             start = int(parts[0].split("-")[-1])
 
     @staticmethod
+    def _check_word(w, vocab=None):
+        return not w.is_stop and w.is_alpha and (vocab is None or w.lemma_ not in vocab)
+
+
+    @staticmethod
     def find_keywords(document, vocab=None):
         document["counters"] = defaultdict(Counter)
         for weight, text in [(1, document.get("description")), (3, document.get("intitule"))]:
             doc = nlp(text)
-            for w in doc:
-                if not w.is_stop and w.is_alpha:
-                    if vocab is not None and w.lemma_ not in vocab:
-                        document["counters"][w.pos_][w.lemma_] += weight
+            for sentence in doc.sents:
+                for i1, w1 in enumerate(sentence):
+                    if Scrapper._check_word(w1, vocab):
+                        document["counters"][w1.pos_][w1.lemma_] += weight
+                        for i2, w2 in enumerate(sentence[i1 + 1:]):
+                            if Scrapper._check_word(w2, vocab):
+                                document["counters"]["bi_gram"][f"{w1.lemma_} {w2.lemma_}"] += weight * 2
+                                for w3 in sentence[i1 + i2 + 2:]:
+                                    if Scrapper._check_word(w3, vocab):
+                                        document["counters"]["tri_gram"][f"{w1.lemma_} {w2.lemma_} {w3.lemma_}"] += weight * 3
+                                        break
+                                break
         return document
 
     @staticmethod
     @cache
     def most_similar(word, topn=15):
         st.write(f"{word} ({zipf_frequency(word, 'fr')})")
+        if " " in word:
+            return []
         word = nlp.vocab[str(word)]
         queries = [
             nlp.vocab[w] for w in nlp.vocab.vectors
